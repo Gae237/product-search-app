@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Search</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Search Products</h2>
+    <input type="text" id="searchInput" placeholder="Enter product name">
+    <button onclick="searchProduct()">Search</button>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    async function searchProduct() {
+      const query = document.getElementById('searchInput').value;
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        alert('You must be logged in to search.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const res = await fetch(`/api/products/search?q=${query}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      if (data.results.length === 0) {
+        resultsDiv.innerHTML = '<p>No products found.</p>';
+      } else {
+        data.results.forEach(product => {
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${product.name}</strong>: ${product.description}`;
+          resultsDiv.appendChild(p);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
